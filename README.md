@@ -3,6 +3,8 @@ Javatop is a command line Linux utility to collect and show JVM thread informati
 
 It can be used directly on server to get instant view of threads. Instead of taking a single thread dump javatop can be used to take several samples and save them into a file to be later examined either remotely or in-place on server.
 
+![Screenshot of javatop](https://raw.githubusercontent.com/tkoivula/javatop/master/doc/img/screenshot-javatop.jpg)
+
 In short, javatop is:
   * tool to visualize what Java app is doing,
   * simple command that runs directly on server,
@@ -20,9 +22,13 @@ Javatop requires JDK. If your server just has JRE installed, you can obtain just
 
   1. Download [javatop](https://github.com/tkoivula/javatop/releases) binary.
   2. Try running it:
-    ```$ ./javatop -h```
-  4. If it doesn't find your Java JDK set JAVA_HOME environment variable to the correct JDK directory:
-    ```$ export JAVA_HOME="/my/path/to/oracle1.8.0/"```
+```
+./javatop -h
+```
+  3. If it doesn't find your Java JDK set JAVA_HOME environment variable to the correct JDK directory:
+```
+export JAVA_HOME="/my/path/to/oracle1.8.0/"
+```
 
 ## Usage
 ```
@@ -43,7 +49,7 @@ Options:
              JVM instance and show results
     -r N-M   Print results from samples N-M (useful with -i option)
     -n N     Print a thread dump of sample N (useful with -i option)
-    -s       Take pme sample and print thread dump (jstack)
+    -s       Take one sample and print thread dump (jstack)
     -d       Print debug information
 ```
 
@@ -51,27 +57,27 @@ Options:
 
 Get an overview of a java application running as service (user tomcat, process ID 7836) directly on server:
 
-    $ sudo -u tomcat javatop 7836
+    sudo -u tomcat javatop 7836
   
-Take samples from a longer period of time and save them into a file:
+Take samples from a longer period of time (5 minutes) and save them into a file:
 
-    $ javatop -t 200 -c 100 -o sampledata.dump
+    javatop -t 500 -c 600 -o sampledata.dump
   
 Take one sample and append it to an existing file (to be used for example peridiocally from a cron script):
 
-    $ javatop -a logs/threads-$(date +%F).dump
+    javatop -a logs/threads-$(date +%F).dump
 
 Get an overview of the application from a dump file:
 
-    $ javatop -i sampledata.dump
+    javatop -i sampledata.dump
   
 Show a thread dump of a specific sample (like jstack but from the past):
 
-    $ javatop -i threads-2015-30-12.dump -n 15
+    javatop -i threads-2015-30-12.dump -n 15
   
 Show a graph from a range of samples from larger dump file:
 
-    $ javatop -i threads-2015-30-12.dump -r 3601-3660 -w 60
+    javatop -i threads-2015-30-12.dump -r 3601-3660 -w 60
   
   
 
