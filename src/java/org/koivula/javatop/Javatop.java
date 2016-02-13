@@ -46,7 +46,24 @@ public class Javatop {
         System.out.println("\nFor more details see <https://github.com/tkoivula/javatop>\n");
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        try {
+            System.exit(run(args));
+        } catch (NoClassDefFoundError t) {
+            System.err.println("ERROR: No tools.jar found. Connecting with remote JVM requires JDK not JRE.");
+            System.err.println("ERROR: Try setting JAVA_HOME environment variable or copy tools.jar into");
+            System.err.println("ERROR: the same directory with javatop command.");
+            System.exit(1);
+            
+        } catch (Throwable t) {
+            String msg = t.getMessage();
+            if (msg == null || msg.length() == 0) msg = "";
+            System.out.println("ERROR: " + t.getClass().getName() + " " + msg);
+            System.exit(2);
+        }
+    }
+
+    protected static int run(String[] args) throws Exception {
         // Params and their defaults:
         int times = 20;
         int interval = 100;
@@ -117,7 +134,7 @@ public class Javatop {
 
         if (!ok) {
             printUsage();
-            System.exit(1);
+            return 1;
         }
 
         ThreadData dump;
@@ -154,6 +171,7 @@ public class Javatop {
 
             //JStack.main(args); 
         }
+        return 0;
     }
 
     private static void printResults(ThreadData dump,

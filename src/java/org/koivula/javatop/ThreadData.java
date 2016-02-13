@@ -1,5 +1,9 @@
 package org.koivula.javatop;
 
+import com.sun.tools.attach.VirtualMachine;
+import com.sun.tools.attach.AttachNotSupportedException;
+import sun.tools.attach.HotSpotVirtualMachine;
+
 import java.lang.management.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -157,29 +161,51 @@ public class ThreadData {
         return list;
     }
 
-    public static JtdaCore parseThreadData(String input, boolean ignoreLocks) {
+    public static JtdaCore parseThreadData(String input, boolean ignoreLocks) throws Exception {
+        if (input.contains("No such process")) {
+            throw new Exception(input);
+        }
         JtdaCore data = new JtdaCore();
         data.analyseSameThread(input, ignoreLocks);
+        if (data.traces.isEmpty()) {
+            throw new Exception("Could not read thread dump.");
+        }
         return data;
+    }
+
+    // Attach to pid and perform a thread dump
+    private static String runThreadDump(String pid) throws Exception {
+        VirtualMachine vm = VirtualMachine.attach(pid);
+
+        // Cast to HotSpotVirtualMachine as this is implementation specific
+        // method.
+        InputStream in = ((HotSpotVirtualMachine)vm).remoteDataDump(new Object[0]);
+
+        // read to EOF and just print output
+        byte b[] = new byte[256];
+        int n;
+        StringBuffer text = new StringBuffer();
+        do {
+            n = in.read(b);
+            if (n > 0) {
+                text.append(new String(b, 0, n, "UTF-8"));
+            }
+        } while (n > 0);
+        in.close();
+        vm.detach();
+        return text.toString();
     }
 
     public void collectSamples(String pid, int times, int interval,
             boolean debug) throws Exception {
         long a = System.currentTimeMillis();
-        PrintStream stdout = System.out;
-        PrintStream stderr = System.err;
         for (int i=0; i<times; ++i) {
             long t0 = System.currentTimeMillis();
-            ByteArrayOutputStream b = new ByteArrayOutputStream();
-            System.setOut(new PrintStream(b));
-            System.setErr(new PrintStream(b));
-            JStack.main(new String[] { pid });
-            System.setOut(stdout);
-            System.setErr(stderr);
+            String outs = runThreadDump(pid);
             if (debug) {
-                System.out.println(b.toString("UTF-8"));
+                System.out.println(outs);
             }
-            threads.add(parseThreadData(b.toString("UTF-8"), true));
+            threads.add(parseThreadData(outs, true));
             long t1 = System.currentTimeMillis();
 
             if (i == 0 && times > 1) {

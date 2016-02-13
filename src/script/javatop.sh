@@ -1,20 +1,29 @@
 #!/bin/sh
+
+# Locate Java
 if [ -z "$JAVA_HOME" ]; then
-    GUESS=true
-
     JAVA=$(ps -eo args |grep java |awk '{ print $1 }'|grep java)
-    JAVA_HOME="$(dirname $JAVA)/../"
-fi
-TOOLS_JAR=$JAVA_HOME/lib/tools.jar
-#SA_JDI_JAR=$JAVA_HOME/lib/sa-jdi.jar
-
-if [ ! -f $TOOLS_JAR ]; then
-    if [ $GUESS ]; then 
-        echo "JDK not found. Try setting JAVA_HOME."
+    if [ -z "$JAVA" ]; then
+        # Use default java
+        JAVA="java"
+        TOOLS_JAR="./tools.jar"
     else
-        echo "Java found but no tools.jar. This command requires JDK. Change JAVA_HOME to point into JDK instead of JRE."
-    fi    
-    exit 2
+        # Use same java with running process
+        JAVA_HOME="$(dirname $JAVA)/../"
+        TOOLS_JAR=$JAVA_HOME/lib/tools.jar
+    fi
+else
+    # Use java from JAVA_HOME
+    JAVA=$JAVA_HOME/bin/java
+    TOOLS_JAR=$JAVA_HOME/lib/tools.jar
 fi
-$JAVA_HOME/bin/java -cp "$TOOLS_JAR:$0" "org.koivula.javatop.Javatop" $@
-exit 0
+
+# Locate tools.jar
+if [ ! -f $TOOLS_JAR ]; then TOOLS_JAR=$JAVA_HOME/tools.jar; fi
+if [ ! -f $TOOLS_JAR ]; then TOOLS_JAR=$(dirname $0)/tools.jar; fi
+if [ ! -f $TOOLS_JAR ]; then TOOLS_JAR=./tools.jar; fi
+
+# Exec
+$JAVA -cp "$TOOLS_JAR:$0" "org.koivula.javatop.Javatop" $@
+
+exit $?
