@@ -18,17 +18,15 @@ Please note that javatop is not complete Java profiler. There are better desktop
 
 ## Installation
 
-Javatop requires JDK. If your server just has JRE installed, you can obtain just the tools.jar from the JDk and copy it to the server.
+Javatop requires JDK. If your server has only JRE installed, you can obtain just the tools.jar from the JDK and copy it to the server.
 
-  1. Download [javatop](https://github.com/tkoivula/javatop/releases) binary.
-  2. Try running it:
+  * Download [javatop](https://github.com/tkoivula/javatop/releases) binary.
+  * If it doesn't find your Java JDK set JAVA_HOME environment variable to the correct JDK directory:
 ```
-./javatop -h
+export JAVA_HOME="/my/path/to/jdk-1.8.0/"
 ```
-  3. If it doesn't find your Java JDK set JAVA_HOME environment variable to the correct JDK directory:
-```
-export JAVA_HOME="/my/path/to/oracle1.8.0/"
-```
+  * Alternatively just copy tools.jar from JDK to the same directory with javatop binary.
+
 
 ## Usage
 ```
