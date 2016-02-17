@@ -1,4 +1,7 @@
 # javatop
+
+[Download javatop](https://github.com/tkoivula/javatop/releases/download/v1.0-beta/javatop)
+
 Javatop is a command line Linux utility to collect and show JVM thread information of a Java application. Javatop is like [jstack](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/jstack.html) command with steroids: javatop takes several thread samples and visualises waiting, blocked, running and I/O threads directly on command line. It can also be used to record thread information into a file to be later examined. 
 
 It can be used directly on server to get instant view of threads. Instead of taking a single thread dump javatop can be used to take several samples and save them into a file to be later examined either remotely or in-place on server.
